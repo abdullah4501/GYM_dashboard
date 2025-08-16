@@ -1,59 +1,109 @@
-import React, { useState } from 'react';
-import { Upload, Video, Eye, Edit, Trash2, Search, Plus, Play } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Eye, Edit, Trash2, Search, Plus, Play } from 'lucide-react';
 import FileUpload from './FileUpload';
+import axios from 'axios';
+import ConfirmModal from "./ConfirmModal";
 
 interface VideoData {
-  id: string;
+  _id: string;
   title: string;
-  category: string;
-  duration: string;
-  views: number;
-  uploadDate: string;
-  status: 'published' | 'draft';
-  thumbnail: string;
+  category: {
+    _id: string;
+    name: string;
+  } | null;
+  level: string;
+  description: string;
+  forMembersOnly: boolean;
+  videoUrl: string;
+  thumbnailUrl?: string;
+  createdAt: string;
 }
 
-const VideoManagement: React.FC = () => {
-  const [showUpload, setShowUpload] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const videos: VideoData[] = [
-    {
-      id: '1',
-      title: 'Full Body HIIT Workout',
-      category: 'HIIT',
-      duration: '25:30',
-      views: 1247,
-      uploadDate: '2024-01-15',
-      status: 'published',
-      thumbnail: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop'
-    },
-    {
-      id: '2',
-      title: 'Strength Training Basics',
-      category: 'Strength',
-      duration: '35:45',
-      views: 892,
-      uploadDate: '2024-01-12',
-      status: 'published',
-      thumbnail: 'https://images.pexels.com/photos/1552106/pexels-photo-1552106.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop'
-    },
-    {
-      id: '3',
-      title: 'Cardio Blast Session',
-      category: 'Cardio',
-      duration: '20:15',
-      views: 654,
-      uploadDate: '2024-01-10',
-      status: 'draft',
-      thumbnail: 'https://images.pexels.com/photos/1552103/pexels-photo-1552103.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop'
-    },
-  ];
+interface CategoryData {
+  _id: string;
+  name: string;
+}
 
-  const filteredVideos = videos.filter(video =>
-    video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    video.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+const API_URL = import.meta.env.VITE_API_URL;
+console.log('Using API URL:', API_URL);
+
+
+const VideoManagement: React.FC = () => {
+  const [videos, setVideos] = useState<VideoData[]>([]);
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showUpload, setShowUpload] = useState(false);
+  const [editVideo, setEditVideo] = useState<VideoData | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+
+  const fetchVideos = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/workout-library`);
+      console.log("Videos API response:", res.data);
+      setVideos(res.data?.videos || []);
+    } catch (err) {
+      setVideos([]); // on error, fallback to empty
+      console.error("Failed to fetch videos:", err);
+    }
+  };
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/workout-categories`);
+      console.log("Categories API response:", res.data);
+      setCategories(res.data?.categories || []);
+    } catch (err) {
+      setCategories([]);
+      console.error("Failed to fetch categories:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchVideos();
+    fetchCategories();
+  }, []);
+
+  const filteredVideos = Array.isArray(videos)
+    ? videos.filter(video =>
+      video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (video.category?.name?.toLowerCase() ?? '').includes(searchTerm.toLowerCase())
+    )
+    : [];
+
+
+  // Handle delete
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this video?')) return;
+    await axios.delete(`${API_URL}/workout-library/${id}`);
+    fetchVideos();
+  };
+
+  // Handle view (show video modal)
+  const handleView = (video: VideoData) => {
+    window.open(`${API_URL.replace('/api', '')}${video.videoUrl}`, '_blank');
+  };
+
+  // Handle edit
+  const handleEdit = (video: VideoData) => setEditVideo(video);
+
+  // Handle upload/edit completion
+  const handleUploadDone = () => {
+    setShowUpload(false);
+    setEditVideo(null);
+    fetchVideos();
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setConfirmDeleteId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteId) return;
+    await axios.delete(`${API_URL}/workout-library/${confirmDeleteId}`);
+    setConfirmDeleteId(null);
+    fetchVideos();
+  };
+  const handleCancelDelete = () => setConfirmDeleteId(null);
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen">
@@ -71,7 +121,7 @@ const VideoManagement: React.FC = () => {
         </button>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search */}
       <div className="bg-gray-800 rounded-lg p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
@@ -84,17 +134,14 @@ const VideoManagement: React.FC = () => {
               className="w-full bg-gray-700 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
             />
           </div>
-          <select className="bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
+          <select
+            className="bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
+            onChange={e => setSearchTerm(e.target.value)}
+          >
             <option value="">All Categories</option>
-            <option value="hiit">HIIT</option>
-            <option value="strength">Strength</option>
-            <option value="cardio">Cardio</option>
-            <option value="flexibility">Flexibility</option>
-          </select>
-          <select className="bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
-            <option value="">All Status</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
+            {categories.map(cat => (
+              <option key={cat._id} value={cat.name}>{cat.name}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -102,10 +149,15 @@ const VideoManagement: React.FC = () => {
       {/* Videos Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredVideos.map((video) => (
-          <div key={video.id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-red-500 transition-colors duration-200">
+          
+          <div key={video._id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-red-500 transition-colors duration-200">
             <div className="relative group">
               <img
-                src={video.thumbnail}
+                src={
+                  video.thumbnailUrl
+                    ? `${API_URL.replace('/api', '')}${video.thumbnailUrl}`
+                    : 'https://placehold.co/320x240?text=No+Thumbnail'
+                }
                 alt={video.title}
                 className="w-full h-48 object-cover"
               />
@@ -113,32 +165,35 @@ const VideoManagement: React.FC = () => {
                 <Play className="w-12 h-12 text-white" />
               </div>
               <div className="absolute top-3 right-3">
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  video.status === 'published' ? 'bg-green-500 text-white' : 'bg-yellow-500 text-black'
-                }`}>
-                  {video.status}
+                <span className={`px-2 py-1 text-xs rounded-full ${video.forMembersOnly ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+                  }`}>
+                  {video.forMembersOnly ? 'Members Only' : 'Public'}
                 </span>
               </div>
               <div className="absolute bottom-3 right-3 bg-black bg-opacity-75 text-white px-2 py-1 text-sm rounded">
-                {video.duration}
+                Level: {video.level}
               </div>
             </div>
             <div className="p-4">
               <h3 className="text-white font-semibold text-lg mb-2">{video.title}</h3>
-              <p className="text-gray-400 text-sm mb-3">{video.category}</p>
+              <p className="text-gray-400 text-sm mb-3">
+                {video.category?.name || 'No Category'}
+              </p>
+              <p className="text-gray-500 text-xs mb-2">{video.description}</p>
               <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
-                <span>{video.views} views</span>
-                <span>{new Date(video.uploadDate).toLocaleDateString()}</span>
+                <span>{new Date(video.createdAt).toLocaleDateString()}</span>
               </div>
               <div className="flex space-x-2">
-                <button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 transition-colors duration-200">
-                  <Eye className="w-4 h-4" />
-                  <span>View</span>
-                </button>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors duration-200">
+                <button
+                  className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors duration-200"
+                  onClick={() => handleEdit(video)}
+                >
                   <Edit className="w-4 h-4" />
                 </button>
-                <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200">
+                <button
+                  className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200"
+                  onClick={() => handleDeleteClick(video._id)}
+                >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -147,17 +202,25 @@ const VideoManagement: React.FC = () => {
         ))}
       </div>
 
-      {/* Upload Modal */}
-      {showUpload && (
+      {/* Upload/Edit Modal */}
+      {(showUpload || editVideo) && (
         <FileUpload
+          key={editVideo ? editVideo._id : 'new'}
           type="video"
-          onClose={() => setShowUpload(false)}
-          onUpload={(file, metadata) => {
-            console.log('Uploading video:', file, metadata);
-            setShowUpload(false);
-          }}
+          categories={categories}
+          onClose={() => { setShowUpload(false); setEditVideo(null); }}
+          onUpload={handleUploadDone}
+          initialData={editVideo}
         />
       )}
+      <ConfirmModal
+        open={!!confirmDeleteId}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Delete Video"
+        description="Are you sure you want to delete this video? This action cannot be undone."
+      />
+
     </div>
   );
 };

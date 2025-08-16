@@ -6,60 +6,49 @@ import {
   Award, 
   Users, 
   Package,
-  Home,
   Settings,
   LogOut
 } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import Logo from '../assets/logo.png';
 
-type ActivePage = 'dashboard' | 'videos' | 'ebooks' | 'certificates' | 'members' | 'plans';
+const menuItems = [
+  { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
+  { to: '/videos', label: 'Videos', icon: Video },
+  { to: '/ebooks', label: 'E-Books', icon: BookOpen },
+  { to: '/certificates', label: 'Certificates', icon: Award },
+  { to: '/members', label: 'Members', icon: Users },
+  { to: '/plans', label: 'Plans', icon: Package },
+];
 
-interface SidebarProps {
-  activePage: ActivePage;
-  setActivePage: (page: ActivePage) => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) => {
-  const menuItems = [
-    { id: 'dashboard' as ActivePage, label: 'Dashboard', icon: BarChart3 },
-    { id: 'videos' as ActivePage, label: 'Videos', icon: Video },
-    { id: 'ebooks' as ActivePage, label: 'E-Books', icon: BookOpen },
-    { id: 'certificates' as ActivePage, label: 'Certificates', icon: Award },
-    { id: 'members' as ActivePage, label: 'Members', icon: Users },
-    { id: 'plans' as ActivePage, label: 'Plans', icon: Package },
-  ];
-
+const Sidebar: React.FC = () => {
   return (
-    <div className="w-64 bg-black min-h-screen border-r border-gray-800">
+    <div className="w-64 bg-black min-h-screen border-r border-gray-800 relative flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-800">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl">P</span>
-          </div>
-          <div>
-            <h2 className="text-white font-bold text-lg">Passion Physique</h2>
-            <p className="text-gray-400 text-sm">Admin Panel</p>
-          </div>
-        </div>
+      <div className="p-6 border-b border-gray-800 flex justify-center">
+        <img src={Logo} alt="" />
       </div>
 
       {/* Navigation */}
-      <nav className="mt-6">
+      <nav className="mt-6 flex-1">
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
-            <button
-              key={item.id}
-              onClick={() => setActivePage(item.id)}
-              className={`w-full flex items-center px-6 py-3 text-left transition-colors duration-200 ${
-                activePage === item.id
-                  ? 'bg-red-500 text-white border-r-2 border-red-400'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-              }`}
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `w-full flex items-center px-6 py-3 text-left transition-colors duration-200 no-underline ${
+                  isActive
+                    ? 'bg-red-500 text-white border-r-2 border-red-400'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                }`
+              }
+              end // ensures /dashboard only matches exactly
             >
               <Icon className="w-5 h-5 mr-3" />
               {item.label}
-            </button>
+            </NavLink>
           );
         })}
       </nav>
