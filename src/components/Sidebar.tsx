@@ -7,7 +7,8 @@ import {
   Users, 
   Package,
   Settings,
-  LogOut
+  LogOut,
+  
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import Logo from '../assets/logo.png';
@@ -18,7 +19,8 @@ const menuItems = [
   { to: '/ebooks', label: 'E-Books', icon: BookOpen },
   { to: '/certificates', label: 'Certificates', icon: Award },
   { to: '/members', label: 'Members', icon: Users },
-  { to: '/plans', label: 'Plans', icon: Package },
+  { to: '/transactions', label: 'Transactions', icon: Package },
+  { to: '/bank-transfers', label: 'SEPA Transfers', icon: Package },
 ];
 
 const Sidebar: React.FC = () => {

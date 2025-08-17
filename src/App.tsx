@@ -6,22 +6,62 @@ import EbookManagement from './components/EbookManagement';
 import CertificateManagement from './components/CertificateManagement';
 import MemberManagement from './components/MemberManagement';
 import PlansManagement from './components/PlansManagement';
+import AdminLogin from './components/AdminLogin'; // Make sure this exists
+import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
+import PurchasesManagement from './components/PurchasesManagement';
+import SEPA from './components/SEPA';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-900 flex">
-        <Sidebar />
+        {/* Only show Sidebar if logged in */}
+        {localStorage.getItem("adminToken") && <Sidebar />}
         <main className="flex-1 overflow-auto">
           <Routes>
+            <Route path="/login" element={<AdminLogin />} />
             <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/videos" element={<VideoManagement />} />
-            <Route path="/ebooks" element={<EbookManagement />} />
-            <Route path="/certificates" element={<CertificateManagement />} />
-            <Route path="/members" element={<MemberManagement />} />
-            <Route path="/plans" element={<PlansManagement />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/videos" element={
+              <ProtectedRoute>
+                <VideoManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/ebooks" element={
+              <ProtectedRoute>
+                <EbookManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/certificates" element={
+              <ProtectedRoute>
+                <CertificateManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/members" element={
+              <ProtectedRoute>
+                <MemberManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/plans" element={
+              <ProtectedRoute>
+                <PlansManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/transactions" element={
+              <ProtectedRoute>
+                <PurchasesManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/bank-transfers" element={
+              <ProtectedRoute>
+                <SEPA />
+              </ProtectedRoute>
+            } />
           </Routes>
         </main>
       </div>

@@ -279,21 +279,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 : 'Upload Video'}
             </button>
           </div>
-
-          {/* Warning */}
-          {(selectedFile || initialData) && (
-            <div className="flex items-start space-x-2 p-3 bg-yellow-900 bg-opacity-50 border border-yellow-600 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5" />
-              <div className="text-sm text-yellow-200">
-                <p className="font-medium">Upload Guidelines:</p>
-                <ul className="mt-1 space-y-1">
-                  <li>• Ensure content follows community guidelines</li>
-                  <li>• Use descriptive titles for better discoverability</li>
-                  <li>• Check file quality and format before uploading</li>
-                </ul>
-              </div>
-            </div>
-          )}
         </form>
       </div>
     </div>

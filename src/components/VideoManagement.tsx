@@ -3,6 +3,8 @@ import { Eye, Edit, Trash2, Search, Plus, Play } from 'lucide-react';
 import FileUpload from './FileUpload';
 import axios from 'axios';
 import ConfirmModal from "./ConfirmModal";
+import VideoModal from './VideoModal'; // Import the modal
+
 
 interface VideoData {
   _id: string;
@@ -25,7 +27,6 @@ interface CategoryData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
-console.log('Using API URL:', API_URL);
 
 
 const VideoManagement: React.FC = () => {
@@ -35,12 +36,12 @@ const VideoManagement: React.FC = () => {
   const [showUpload, setShowUpload] = useState(false);
   const [editVideo, setEditVideo] = useState<VideoData | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeVideo, setActiveVideo] = useState<VideoData | null>(null);
 
   const fetchVideos = async () => {
     try {
       const res = await axios.get(`${API_URL}/workout-library`);
-      console.log("Videos API response:", res.data);
       setVideos(res.data?.videos || []);
     } catch (err) {
       setVideos([]); // on error, fallback to empty
@@ -50,7 +51,6 @@ const VideoManagement: React.FC = () => {
   const fetchCategories = async () => {
     try {
       const res = await axios.get(`${API_URL}/workout-categories`);
-      console.log("Categories API response:", res.data);
       setCategories(res.data?.categories || []);
     } catch (err) {
       setCategories([]);
@@ -78,9 +78,10 @@ const VideoManagement: React.FC = () => {
     fetchVideos();
   };
 
-  // Handle view (show video modal)
-  const handleView = (video: VideoData) => {
-    window.open(`${API_URL.replace('/api', '')}${video.videoUrl}`, '_blank');
+
+  const handlePlay = (video: VideoData) => {
+    setActiveVideo(video);
+    setModalOpen(true);
   };
 
   // Handle edit
@@ -149,7 +150,7 @@ const VideoManagement: React.FC = () => {
       {/* Videos Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredVideos.map((video) => (
-          
+
           <div key={video._id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-red-500 transition-colors duration-200">
             <div className="relative group">
               <img
@@ -162,8 +163,15 @@ const VideoManagement: React.FC = () => {
                 className="w-full h-48 object-cover"
               />
               <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                <Play className="w-12 h-12 text-white" />
+                <button
+                  type="button"
+                  className="focus:outline-none"
+                  onClick={e => { e.stopPropagation(); handlePlay(video); }}
+                >
+                  <Play className="w-12 h-12 text-white" />
+                </button>
               </div>
+
               <div className="absolute top-3 right-3">
                 <span className={`px-2 py-1 text-xs rounded-full ${video.forMembersOnly ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
                   }`}>
@@ -220,6 +228,14 @@ const VideoManagement: React.FC = () => {
         title="Delete Video"
         description="Are you sure you want to delete this video? This action cannot be undone."
       />
+      <VideoModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        videoId={activeVideo?._id || ''}  // <-- ✅ use activeVideo
+        title={activeVideo?.title || ''}
+      />
+
+
 
     </div>
   );
