@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Charts and Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <ChartCard />
         <div className="bg-gray-800 rounded-lg p-6">
           <h3 className="text-xl font-semibold text-white mb-4">Recent Activity</h3>
@@ -74,10 +74,10 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Revenue Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gray-800 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold text-white">Monthly Revenue</h3>
@@ -101,7 +101,7 @@ const Dashboard: React.FC = () => {
             +5.2% conversion rate
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

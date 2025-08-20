@@ -74,6 +74,7 @@ const AdminLogin: React.FC = () => {
             <input
               id="username"
               name="username"
+              placeholder="Enter your username"
               type="text"
               value={form.username}
               onChange={handleChange}
@@ -92,6 +93,7 @@ const AdminLogin: React.FC = () => {
               id="password"
               name="password"
               type="password"
+              placeholder="********"
               value={form.password}
               onChange={handleChange}
               className="w-full bg-[#282828] text-white h-[44px] px-4 rounded border-none outline-none focus:ring-2 focus:ring-primary"

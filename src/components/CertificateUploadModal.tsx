@@ -13,21 +13,27 @@ const CertificateUploadModal: React.FC<Props> = ({ open, onClose, onUpload }) =>
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [cover, setCover] = useState<File | null>(null); // New state for cover
   const [submitting, setSubmitting] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] || null);
   };
 
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCover(e.target.files?.[0] || null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !file) return;
+    if (!name || !file || !cover) return;
     setSubmitting(true);
     try {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);
       formData.append("file", file);
+      formData.append("thumb", cover); // Add cover as 'thumb'
 
       const adminToken = localStorage.getItem("adminToken");
       await axios.post(`${API_URL}/certificates`, formData, {
@@ -58,7 +64,7 @@ const CertificateUploadModal: React.FC<Props> = ({ open, onClose, onUpload }) =>
         <h3 className="text-xl font-semibold text-white mb-4">Upload Certificate</h3>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Name <span className="text-red-500">*</span></label>
             <input
               type="text"
               value={name}
@@ -69,7 +75,7 @@ const CertificateUploadModal: React.FC<Props> = ({ open, onClose, onUpload }) =>
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Description <span className="text-red-500">*</span></label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
@@ -79,7 +85,7 @@ const CertificateUploadModal: React.FC<Props> = ({ open, onClose, onUpload }) =>
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">PDF File</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">PDF File <span className="text-red-500">*</span></label>
             <input
               type="file"
               accept="application/pdf"
@@ -87,6 +93,24 @@ const CertificateUploadModal: React.FC<Props> = ({ open, onClose, onUpload }) =>
               onChange={handleFileChange}
               className="block w-full text-white"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Cover <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="file"
+              accept="image/png,image/jpeg"
+              required
+              onChange={handleCoverChange}
+              className="block w-full text-white"
+            />
+            {cover && (
+              <div className="mt-2">
+                <span className="text-gray-400 text-xs">Selected:</span>
+                <span className="ml-2 text-white text-xs">{cover.name}</span>
+              </div>
+            )}
           </div>
           <div className="flex space-x-3 mt-6">
             <button
@@ -99,7 +123,7 @@ const CertificateUploadModal: React.FC<Props> = ({ open, onClose, onUpload }) =>
             </button>
             <button
               type="submit"
-              disabled={submitting || !name || !file}
+              disabled={submitting || !name || !file || !cover}
               className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors duration-200"
             >
               {submitting ? "Uploading..." : "Upload"}

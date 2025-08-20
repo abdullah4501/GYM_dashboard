@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Search, Eye, CheckCircle, XCircle, Download, User, Calendar, FileImage } from "lucide-react";
 import axios from "axios";
+import ConfirmModal from "./ConfirmModal";
 
 interface Receipt {
     _id: string;
@@ -33,6 +34,12 @@ const SEPA: React.FC = () => {
     const [filterStatus, setFilterStatus] = useState("");
     const [previewImg, setPreviewImg] = useState<string | null>(null);
     const adminToken = localStorage.getItem("adminToken");
+    const [confirmModal, setConfirmModal] = useState<{
+        open: boolean;
+        action: null | "approve" | "reject";
+        receiptId: string | null;
+    }>({ open: false, action: null, receiptId: null });
+
 
     useEffect(() => {
         const fetchReceipts = async () => {
@@ -63,16 +70,45 @@ const SEPA: React.FC = () => {
         setReceipts((r) => r.map(rec => rec._id === id ? { ...rec, status: "rejected" } : rec));
     };
 
-    // Filtered & searched receipts
     const filtered = receipts.filter(rec => {
-        const name = `${rec.user.firstName} ${rec.user.lastName}`.toLowerCase();
+        const firstName = rec.user?.firstName || "";
+        const lastName = rec.user?.lastName || "";
+        const email = rec.user?.email || "";
+        const priceId = rec.priceId || "";
+
+        const name = `${firstName} ${lastName}`.toLowerCase();
+        const searchTerm = search.toLowerCase();
+
         const matchSearch =
-            name.includes(search.toLowerCase()) ||
-            rec.user.email.toLowerCase().includes(search.toLowerCase()) ||
-            rec.priceId.toLowerCase().includes(search.toLowerCase());
+            name.includes(searchTerm) ||
+            email.toLowerCase().includes(searchTerm) ||
+            priceId.toLowerCase().includes(searchTerm);
+
         const matchStatus = !filterStatus || rec.status === filterStatus;
         return matchSearch && matchStatus;
     });
+
+
+    // Open confirmation for approve
+    const askApprove = (id: string) => {
+        setConfirmModal({ open: true, action: "approve", receiptId: id });
+    };
+    // Open confirmation for reject
+    const askReject = (id: string) => {
+        setConfirmModal({ open: true, action: "reject", receiptId: id });
+    };
+
+    const handleConfirm = async () => {
+        if (!confirmModal.receiptId || !confirmModal.action) return;
+        if (confirmModal.action === "approve") {
+            await handleApprove(confirmModal.receiptId);
+        } else if (confirmModal.action === "reject") {
+            await handleReject(confirmModal.receiptId);
+        }
+        setConfirmModal({ open: false, action: null, receiptId: null });
+    };
+    const handleCloseModal = () => setConfirmModal({ open: false, action: null, receiptId: null });
+
 
     return (
         <div className="p-6 bg-gray-900 min-h-screen">
@@ -123,8 +159,15 @@ const SEPA: React.FC = () => {
                         <tbody className="divide-y divide-gray-700">
                             {filtered.map(rec => (
                                 <tr key={rec._id} className="hover:bg-gray-750">
-                                    <td className="px-6 py-4 whitespace-nowrap text-white font-medium">{rec.user.firstName} {rec.user.lastName}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-gray-300">{rec.user.email}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-white font-medium">
+                                        {rec.user
+                                            ? `${rec.user.firstName} ${rec.user.lastName}`
+                                            : <span className="italic text-gray-400">Deleted User</span>
+                                        }
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-gray-300">
+                                        {rec.user ? rec.user.email : <span className="italic text-gray-400">—</span>}
+                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap font-mono text-xs text-blue-400">{rec.priceId}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {rec.receipt && (
@@ -143,18 +186,18 @@ const SEPA: React.FC = () => {
                                         <span className={`px-2 py-1 text-xs rounded-full ${statusColors[rec.status]}`}>{rec.status}</span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                            <select
-                                                defaultValue=""
-                                                onChange={e => {
-                                                    if (e.target.value === "approve") handleApprove(rec._id);
-                                                    if (e.target.value === "reject") handleReject(rec._id);
-                                                }}
-                                                className="bg-gray-700 text-white rounded-lg px-2 py-1 focus:ring-1 focus:ring-red-500"
-                                            >
-                                                <option value="" disabled>Actions</option>
-                                                <option value="approve">Approve</option>
-                                                <option value="reject">Reject</option>
-                                            </select>
+                                        <select
+                                            defaultValue=""
+                                            onChange={e => {
+                                                if (e.target.value === "approve") askApprove(rec._id);
+                                                if (e.target.value === "reject") askReject(rec._id);
+                                            }}
+                                            className="bg-gray-700 text-white rounded-lg px-2 py-1 focus:ring-1 focus:ring-red-500"
+                                        >
+                                            <option value="" disabled>Actions</option>
+                                            <option value="approve">Approve</option>
+                                            <option value="reject">Reject</option>
+                                        </select>
                                     </td>
                                 </tr>
                             ))}
@@ -164,6 +207,7 @@ const SEPA: React.FC = () => {
                                 </tr>
                             )}
                         </tbody>
+
                     </table>
                 </div>
             </div>
@@ -177,7 +221,19 @@ const SEPA: React.FC = () => {
                         <img src={previewImg} alt="Receipt Preview" className="max-w-[80vw] max-h-[80vh] rounded-xl shadow-lg" />
                     </div>
                 </div>
-    )}
+            )}
+            <ConfirmModal
+                open={confirmModal.open}
+                onClose={handleCloseModal}
+                onConfirm={handleConfirm}
+                title={confirmModal.action === "approve" ? "Approve Receipt" : "Reject Receipt"}
+                description={
+                    confirmModal.action === "approve"
+                        ? "Are you sure you want to approve this receipt? This cannot be undone."
+                        : "Are you sure you want to reject this receipt? This cannot be undone."
+                }
+            />
+
         </div>
     );
 };

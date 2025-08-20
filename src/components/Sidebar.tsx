@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { 
   BarChart3, 
   Video, 
@@ -23,7 +23,16 @@ const menuItems = [
   { to: '/bank-transfers', label: 'SEPA Transfers', icon: Package },
 ];
 
+
+
 const Sidebar: React.FC = () => {
+  const [user, setUser] = useState<any>(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    setUser(null);
+    window.location.reload();
+  };
   return (
     <div className="w-64 bg-black min-h-screen border-r border-gray-800 relative flex flex-col">
       {/* Logo */}
@@ -57,11 +66,14 @@ const Sidebar: React.FC = () => {
 
       {/* Bottom Actions */}
       <div className="absolute bottom-0 w-64 border-t border-gray-800">
-        <button className="w-full flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200">
+        {/* <button className="w-full flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200">
           <Settings className="w-5 h-5 mr-3" />
           Settings
-        </button>
-        <button className="w-full flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-red-400 transition-colors duration-200">
+        </button> */}
+        <button className="w-full flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-red-400 transition-colors duration-200" 
+          onClick={() => {
+            handleLogout();
+          }}>
           <LogOut className="w-5 h-5 mr-3" />
           Logout
         </button>

@@ -18,20 +18,28 @@ const CertificateEditModal: React.FC<Props> = ({ certificate, onClose, onUpdate 
   const [name, setName] = useState(certificate.name);
   const [description, setDescription] = useState(certificate.description);
   const [file, setFile] = useState<File | null>(null);
+  const [cover, setCover] = useState<File | null>(null); // <-- new state
   const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] || null);
   };
 
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCover(e.target.files?.[0] || null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setErrorMsg("");
     try {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);
       if (file) formData.append("file", file);
+      if (cover) formData.append("thumb", cover); // <-- send cover as 'thumb'
 
       const adminToken = localStorage.getItem("adminToken");
       await axios.put(`${API_URL}/certificates/${certificate._id}`, formData, {
@@ -41,8 +49,13 @@ const CertificateEditModal: React.FC<Props> = ({ certificate, onClose, onUpdate 
         },
       });
       onUpdate();
-    } catch {
-      // toast error
+    } catch (err: any) {
+      // 👇 Check for backend response error
+      if (err.response && err.response.data && err.response.data.error) {
+        setErrorMsg(err.response.data.error);
+      } else {
+        setErrorMsg("Something went wrong.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -60,7 +73,7 @@ const CertificateEditModal: React.FC<Props> = ({ certificate, onClose, onUpdate 
         <h3 className="text-xl font-semibold text-white mb-4">Edit Certificate</h3>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Name <span className="text-red-500">*</span></label>
             <input
               type="text"
               value={name}
@@ -71,7 +84,7 @@ const CertificateEditModal: React.FC<Props> = ({ certificate, onClose, onUpdate 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Description <span className="text-red-500">*</span></label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
@@ -89,6 +102,30 @@ const CertificateEditModal: React.FC<Props> = ({ certificate, onClose, onUpdate 
               className="block w-full text-white"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Cover <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="file"
+              accept="image/png,image/jpeg"
+              onChange={handleCoverChange}
+              required
+              className="block w-full text-white"
+            />
+            {cover && (
+              <div className="mt-2">
+                <span className="text-gray-400 text-xs">Selected:</span>
+                <span className="ml-2 text-white text-xs">{cover.name}</span>
+              </div>
+            )}
+          </div>
+          {errorMsg && (
+            <div className="bg-red-700 text-white px-4 py-2 rounded mb-2 text-sm">
+              {errorMsg}
+            </div>
+          )}
+
           <div className="flex space-x-3 mt-6">
             <button
               type="button"
@@ -100,7 +137,7 @@ const CertificateEditModal: React.FC<Props> = ({ certificate, onClose, onUpdate 
             </button>
             <button
               type="submit"
-              disabled={submitting || !name}
+              disabled={submitting || !name || !cover}
               className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors duration-200"
             >
               {submitting ? "Saving..." : "Save Changes"}

@@ -14,7 +14,7 @@ const ConfirmModal = ({ open, onClose, onConfirm, title = "Are you sure?", descr
             className="bg-[#ff3c33] hover:bg-[#e03228] text-white px-7 py-2 rounded font-semibold transition-all duration-150"
             onClick={onConfirm}
           >
-            Yes, Delete
+            Yes
           </button>
           <button
             className="bg-[#2E2E2E] hover:bg-[#444] text-[#fff] px-7 py-2 rounded font-semibold transition-all duration-150"
