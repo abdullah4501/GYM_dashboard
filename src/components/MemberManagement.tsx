@@ -9,10 +9,11 @@ interface MemberData {
   email: string;
   plan: string;
   memberSince: string | null;
-  lastActivity: string;
+
   membership?: {
     _id: string;
     paymentStatus: string;
+    subscriptionId: string;
     startDate?: string;
     endDate?: string;
   };
@@ -197,8 +198,9 @@ const MemberManagement: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Plan</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Paid From</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Member Since</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Last Activity</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Renewal Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -224,11 +226,23 @@ const MemberManagement: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {!member.membership
+                        ? '—'
+                        : (member.membership.subscriptionId && member.membership.subscriptionId.startsWith('sub_'))
+                          ? 'Stripe'
+                          : 'SEPA'}
+                    </td>
+
+
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       {member.memberSince ? new Date(member.memberSince).toLocaleDateString() : '—'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {member.lastActivity ? new Date(member.lastActivity).toLocaleDateString() : '—'}
+                      {member.membership?.endDate
+                        ? new Date(member.membership.endDate).toLocaleDateString()
+                        : '—'}
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                       {isInactive ? (
                         <select disabled className="bg-gray-500 text-white rounded-lg px-2 py-1">

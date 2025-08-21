@@ -13,6 +13,7 @@ interface Receipt {
     };
     priceId: string;
     receipt: string;
+    purchasedType: string;
     status: "pending" | "approved" | "rejected";
     createdAt: string;
     updatedAt: string;
@@ -151,6 +152,7 @@ const SEPA: React.FC = () => {
                                 <th className="px-6 py-3 text-left text-[16px] font-medium text-gray-300 uppercase tracking-wider">Email</th>
                                 <th className="px-6 py-3 text-left text-[16px] font-medium text-gray-300 uppercase tracking-wider">Transaction ID</th>
                                 <th className="px-6 py-3 text-left text-[16px] font-medium text-gray-300 uppercase tracking-wider">Receipt</th>
+                                <th className="px-6 py-3 text-left text-[16px] font-medium text-gray-300 uppercase tracking-wider">Purchase Type</th>
                                 <th className="px-6 py-3 text-left text-[16px] font-medium text-gray-300 uppercase tracking-wider"><Calendar className="inline w-5 h-5 mr-2" />Uploaded</th>
                                 <th className="px-6 py-3 text-left text-[16px] font-medium text-gray-300 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-3 text-left text-[16px] font-medium text-gray-300 uppercase tracking-wider">Actions</th>
@@ -178,6 +180,14 @@ const SEPA: React.FC = () => {
                                                 <a href={`${IMAGE_BASE}${rec.receipt}`} download className="ml-2 text-gray-300 hover:text-white"><Download className="w-5 h-5" /></a>
                                             </>
                                         )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        {rec.purchasedType
+                                            ? rec.purchasedType
+                                                .split(' ')
+                                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                                .join(' ')
+                                            : "—"}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                                         {rec.createdAt ? new Date(rec.createdAt).toLocaleDateString() : "—"}
