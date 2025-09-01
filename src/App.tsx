@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -13,18 +14,23 @@ import PurchasesManagement from './components/PurchasesManagement';
 import SEPA from './components/SEPA';
 
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <Router>
       <div className="min-h-screen bg-gray-900 flex">
         {/* Only show Sidebar if logged in */}
-        {localStorage.getItem("adminToken") && <Sidebar />}
-        <main className="flex-1 overflow-auto">
+        {localStorage.getItem("adminToken") && (
+          <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+        )}
+
+
+        <main className="flex-1 overflow-auto md:ml-64 transition-all duration-300">
           <Routes>
             <Route path="/login" element={<AdminLogin />} />
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
-                <Dashboard />
+                <Dashboard setSidebarOpen={setSidebarOpen}/>
               </ProtectedRoute>
             } />
             <Route path="/videos" element={
