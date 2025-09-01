@@ -12,6 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 import PurchasesManagement from './components/PurchasesManagement';
 import SEPA from './components/SEPA';
+import AdminSettings from './components/AdminSettings';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,13 +25,14 @@ function App() {
         )}
 
 
-        <main className="flex-1 overflow-auto md:ml-64 transition-all duration-300">
+        <main className={`flex-1 overflow-auto transition-all duration-300 ${localStorage.getItem("adminToken") ? "md:ml-64" : ""
+          }`}>
           <Routes>
             <Route path="/login" element={<AdminLogin />} />
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
-                <Dashboard setSidebarOpen={setSidebarOpen}/>
+                <Dashboard setSidebarOpen={setSidebarOpen} />
               </ProtectedRoute>
             } />
             <Route path="/videos" element={
@@ -66,6 +68,11 @@ function App() {
             <Route path="/bank-transfers" element={
               <ProtectedRoute>
                 <SEPA />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-settings" element={
+              <ProtectedRoute>
+                <AdminSettings />
               </ProtectedRoute>
             } />
           </Routes>

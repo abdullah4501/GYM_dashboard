@@ -3,15 +3,15 @@ import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
 interface AdminResponse {
   admin: {
     id: string;
-    username: string;
     email: string;
   };
   token: string;
   msg?: string;
 }
 
+
 const AdminLogin: React.FC = () => {
-  const [form, setForm] = useState({ username: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -67,16 +67,16 @@ const AdminLogin: React.FC = () => {
           <div>
             <label
               className="block text-white text-[16px] mb-2"
-              htmlFor="username"
+              htmlFor="email"
             >
-              Username*
+              Email*
             </label>
             <input
-              id="username"
-              name="username"
-              placeholder="Enter your username"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
               type="text"
-              value={form.username}
+              value={form.email}
               onChange={handleChange}
               className="w-full bg-[#282828] text-white h-[44px] px-4 rounded border-none outline-none focus:ring-2 focus:ring-primary"
               required
