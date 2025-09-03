@@ -1,4 +1,6 @@
-import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
+import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import { Eye, EyeOff } from "lucide-react"; 
+import { Link } from "react-router-dom";
 
 interface AdminResponse {
   admin: {
@@ -9,12 +11,12 @@ interface AdminResponse {
   msg?: string;
 }
 
-
 const AdminLogin: React.FC = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     // If already logged in, redirect to dashboard
@@ -49,7 +51,7 @@ const AdminLogin: React.FC = () => {
       localStorage.setItem("adminToken", data.token);
 
       setTimeout(() => {
-        window.location.href = "/dashboard"; // Update path as needed
+        window.location.href = "/admin/dashboard";
       }, 1000);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -89,16 +91,35 @@ const AdminLogin: React.FC = () => {
             >
               Password*
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="********"
-              value={form.password}
-              onChange={handleChange}
-              className="w-full bg-[#282828] text-white h-[44px] px-4 rounded border-none outline-none focus:ring-2 focus:ring-primary"
-              required
-            />
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="********"
+                value={form.password}
+                onChange={handleChange}
+                className="w-full bg-[#282828] text-white h-[44px] px-4 rounded border-none outline-none focus:ring-2 focus:ring-primary pr-12"
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary"
+                onClick={() => setShowPassword((prev) => !prev)}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+              </button>
+            </div>
+            {/* Forgot password link */}
+            <div className="flex justify-end mt-2">
+              <Link
+                to="/admin/forgot-password"
+                className="text-white underline text-[15px]"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </div>
           {error && <p className="text-red-500">{error}</p>}
           {success && <p className="text-green-500">{success}</p>}

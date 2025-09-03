@@ -13,6 +13,9 @@ import { Toaster } from 'react-hot-toast';
 import PurchasesManagement from './components/PurchasesManagement';
 import SEPA from './components/SEPA';
 import AdminSettings from './components/AdminSettings';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
+
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -75,6 +78,8 @@ function App() {
                 <AdminSettings />
               </ProtectedRoute>
             } />
+            <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+            <Route path="/admin/reset-password" element={<ResetPassword />} />
           </Routes>
         </main>
       </div>

@@ -147,7 +147,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setSidebarOpen }) => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
             </div>
           ) : (
-            <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+            <div className="space-y-3 max-h-[450px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
               {recentMembers.length === 0 ? (
                 <div className="text-center py-8">
                   <UserIcon className="w-12 h-12 text-gray-600 mx-auto mb-3" />
@@ -213,7 +213,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setSidebarOpen }) => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
             </div>
           ) : (
-            <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+            <div className="space-y-3 max-h-[450px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
               {recentTransactions.length === 0 ? (
                 <div className="text-center py-8">
                   <CreditCard className="w-12 h-12 text-gray-600 mx-auto mb-3" />

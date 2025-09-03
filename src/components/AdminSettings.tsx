@@ -286,7 +286,7 @@ export default function AdminSettings() {
               </div>
 
               {/* Save Button */}
-              <div className="flex justify-end">
+              <div className="flex justify-start">
                 <button
                   type="button"
                   onClick={handleSave}
@@ -301,36 +301,6 @@ export default function AdminSettings() {
 
           {/* Sidebar Information */}
           <div className="space-y-6">
-            {/* Account Status */}
-            <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-green-500/20 rounded-lg">
-                  <Shield className="w-5 h-5 text-green-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-white">Account Status</h3>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400 text-sm">Role</span>
-                  <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-medium">
-                    Administrator
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400 text-sm">Status</span>
-                  <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-medium">
-                    Active
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400 text-sm">Last Login</span>
-                  <span className="text-gray-300 text-xs">
-                    Today, 10:30 AM
-                  </span>
-                </div>
-              </div>
-            </div>
 
             {/* Security Tips */}
             <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
@@ -357,40 +327,6 @@ export default function AdminSettings() {
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
                   <p>Never share your admin credentials with others</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-purple-500/20 rounded-lg">
-                  <User className="w-5 h-5 text-purple-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-white">Recent Activity</h3>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-white text-sm">Login successful</p>
-                    <p className="text-gray-400 text-xs">Today, 10:30 AM</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-white text-sm">Settings updated</p>
-                    <p className="text-gray-400 text-xs">Yesterday, 3:45 PM</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-white text-sm">Password changed</p>
-                    <p className="text-gray-400 text-xs">3 days ago</p>
-                  </div>
                 </div>
               </div>
             </div>
