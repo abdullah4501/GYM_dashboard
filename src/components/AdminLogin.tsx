@@ -21,7 +21,7 @@ const AdminLogin: React.FC = () => {
   useEffect(() => {
     // If already logged in, redirect to dashboard
     const token = localStorage.getItem("adminToken");
-    if (token) window.location.href = "/admin/dashboard";
+    if (token) window.location.href = "/dashboard";
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +51,7 @@ const AdminLogin: React.FC = () => {
       localStorage.setItem("adminToken", data.token);
 
       setTimeout(() => {
-        window.location.href = "/admin/dashboard";
+        window.location.href = "/dashboard";
       }, 1000);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
