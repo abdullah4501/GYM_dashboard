@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Video, BookOpen, User as UserIcon, Mail, Calendar, CreditCard, Menu} from 'lucide-react';
+import { Users, Video, BookOpen, User as UserIcon, Mail, Calendar, CreditCard, Menu } from 'lucide-react';
 import StatsCard from './StatsCard';
 
 type Stats = {
@@ -154,41 +154,23 @@ const Dashboard: React.FC<DashboardProps> = ({ setSidebarOpen }) => {
                   <p className="text-gray-400">No recent subscribers</p>
                 </div>
               ) : (
-                recentMembers.map((member) => (
-                  <div
-                    key={member._id}
-                    className="bg-gray-700/50 rounded-lg p-4 hover:bg-gray-700 transition-colors duration-200"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
-                            <UserIcon className="w-4 h-4 text-blue-400" />
-                          </div>
-                          <span className="font-medium text-white text-base">
-                            {[member.user.firstName, member.user.lastName].filter(Boolean).join(' ') || 'No Name'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 ml-10">
-                          <Mail className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-300 text-sm truncate">
-                            {member.user?.email || "No Email"}
-                          </span>
-                        </div>
+                recentMembers.map((member) => {
+                  const fullName =
+                    [member.user?.firstName, member.user?.lastName].filter(Boolean).join(' ') || "Unknown User";
+                  const email = member.user?.email || "No Email Saved";
+
+                  return (
+                    <div key={member._id} className="bg-gray-700/50 rounded-lg p-4 hover:bg-gray-700">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-white">{fullName}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-400 text-xs bg-gray-800 px-3 py-1 rounded-full whitespace-nowrap ml-10 sm:ml-0">
-                        <Calendar className="w-3 h-3" />
-                        {new Date(member.createdAt).toLocaleString('en-GB', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                      <div className="flex items-center gap-2 ml-10">
+                        <Mail className="w-4 h-4 text-gray-400" />
+                        <span className="text-gray-300 text-sm truncate">{email}</span>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
@@ -220,65 +202,30 @@ const Dashboard: React.FC<DashboardProps> = ({ setSidebarOpen }) => {
                   <p className="text-gray-400">No transactions found</p>
                 </div>
               ) : (
-                recentTransactions.map((tx) => (
-                  <div
-                    key={tx._id}
-                    className="bg-gray-700/50 rounded-lg p-4 hover:bg-gray-700 transition-colors duration-200"
-                  >
-                    <div className="flex flex-col gap-3">
-                      {/* Amount and Item */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <div className="flex items-center gap-3">
-                          <div className="text-green-400 font-bold text-xl">
-                            €{tx.amount.toLocaleString()}
-                          </div>
-                          <div className="flex items-center gap-2 text-yellow-400 text-sm bg-yellow-500/10 px-3 py-1 rounded-full">
-                            <CreditCard className="w-3 h-3" />
-                            <span className="font-medium">{tx.itemType.charAt(0).toUpperCase() + tx.itemType.slice(1)}</span>
-                          </div>
-                        </div>
-                        <div className="text-gray-300 font-medium text-sm bg-gray-800 px-3 py-1 rounded-full truncate">
-                          {tx.itemName}
-                        </div>
-                      </div>
+                recentTransactions.map((tx) => {
+                  const txName =
+                    [tx.user?.firstName, tx.user?.lastName].filter(Boolean).join(' ') || "Unknown User";
+                  const txEmail = tx.user?.email || "No Email";
 
-                      {/* User Info and Date */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <div className="flex flex-col xs:flex-row xs:items-center gap-2 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center">
-                              <UserIcon className="w-3 h-3 text-blue-400" />
-                            </div>
-                            <span className="text-gray-200 text-sm font-medium">
-                              {[tx.user.firstName, tx.user.lastName].filter(Boolean).join(' ') || 'Unknown User'}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 ml-8 xs:ml-0">
-                            <Mail className="w-3 h-3 text-gray-400" />
-                            <span className="text-gray-400 text-xs truncate">
-                              {tx.user?.email || "No Email"}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-400 text-xs bg-gray-800 px-3 py-1 rounded-full whitespace-nowrap ml-8 sm:ml-0">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(tx.date).toLocaleString('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
+                  return (
+                    <div key={tx._id} className="bg-gray-700/50 rounded-lg p-4 hover:bg-gray-700">
+                      <div className="flex items-center gap-2">
+                        <UserIcon className="w-3 h-3 text-blue-400" />
+                        <span className="text-gray-200 text-sm font-medium">{txName}</span>
+                      </div>
+                      <div className="flex items-center gap-2 ml-8">
+                        <Mail className="w-3 h-3 text-gray-400" />
+                        <span className="text-gray-400 text-xs truncate">{txEmail}</span>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
         </div>
       </div>
+
 
 
 
