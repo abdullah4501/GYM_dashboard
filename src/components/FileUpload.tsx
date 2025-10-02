@@ -11,7 +11,7 @@ interface FileUploadProps {
   initialData?: any;
 }
 
-const API_URL = import.meta.env.VITE_API_URL ;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const FileUpload: React.FC<FileUploadProps> = ({
   type,
@@ -25,20 +25,27 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [title, setTitle] = useState(initialData?.title || '');
   const [category, setCategory] = useState(initialData?.category?._id || '');
   const [description, setDescription] = useState(initialData?.description || '');
-  const [level, setLevel] = useState(initialData?.level || '');
   const [forMembersOnly, setForMembersOnly] = useState(
     initialData?.forMembersOnly !== undefined ? initialData.forMembersOnly : true
   );
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const [localCategories, setLocalCategories] = useState(categories);
+
+  useEffect(() => {
+    setLocalCategories(categories);
+  }, [categories]);
+
+
 
   // Set file for editing (optional: prefill)
   useEffect(() => {
     setTitle(initialData?.title || '');
     setCategory(initialData?.category?._id || '');
     setDescription(initialData?.description || '');
-    setLevel(initialData?.level || '');
     setForMembersOnly(
       initialData?.forMembersOnly !== undefined ? initialData.forMembersOnly : true
     );
@@ -69,7 +76,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
     formData.append('title', title);
     formData.append('category', category);
     formData.append('description', description);
-    formData.append('level', level);
     formData.append('forMembersOnly', forMembersOnly ? 'true' : 'false');
 
     try {
@@ -103,6 +109,43 @@ const FileUpload: React.FC<FileUploadProps> = ({
     }
   };
 
+  // Add category
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return;
+    try {
+      const token = localStorage.getItem("adminToken");
+      const res = await axios.post(
+        `${API_URL}/workout-categories`,
+        { name: newCategory },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLocalCategories((prev) => [res.data.category, ...prev]);
+      setCategory(res.data.category._id);
+
+      setNewCategory('');
+      setAddingCategory(false);
+      toast.success("Category added!");
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Failed to add category");
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      await axios.delete(`${API_URL}/workout-categories/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Category deleted!");
+      // ✅ Update local state instead of closing modal
+      setLocalCategories((prev) => prev.filter((cat) => cat._id !== id));
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Failed to delete category");
+    }
+  };
+
+
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -118,11 +161,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* File Drop Zone */}
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${
-              selectedFile
-                ? 'border-green-500 bg-green-50 bg-opacity-5'
-                : 'border-gray-600 hover:border-red-500'
-            }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${selectedFile
+              ? 'border-green-500 bg-green-50 bg-opacity-5'
+              : 'border-gray-600 hover:border-red-500'
+              }`}
           >
             {selectedFile ? (
               <div className="flex items-center justify-center space-x-4">
@@ -200,38 +242,73 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Category *
+                Categories
               </label>
-              <select
-                value={category}
-                required
-                onChange={e => setCategory(e.target.value)}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
-              >
-                <option value="">Select a category</option>
-                {categories.map(cat => (
-                  <option key={cat._id} value={cat._id}>
+
+              <div className="flex flex-wrap gap-2 mt-3">
+                {localCategories.map((cat) => (
+                  <span
+                    key={cat._id}
+                    className={`px-3 py-1 rounded-full text-sm flex items-center cursor-pointer ${category === cat._id
+                      ? 'bg-red-500 text-white'
+                      : 'bg-gray-700 text-white'
+                      }`}
+                    onClick={() => setCategory(cat._id)} // ✅ clicking badge selects it
+                  >
                     {cat.name}
-                  </option>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation(); // don’t trigger selection
+                        handleDeleteCategory(cat._id); // delete directly, no confirm
+                      }}
+                      className="ml-2 text-red-300 hover:text-red-600 font-bold"
+                    >
+                      ×
+                    </button>
+
+                  </span>
                 ))}
-              </select>
+              </div>
+              {!addingCategory ? (
+                <button
+                  type="button"
+                  onClick={() => setAddingCategory(true)}
+                  className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-[2px] rounded-md text-[13px] mt-3"
+                >
+                  + Add New
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="text"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="New category name"
+                    className="flex-1 bg-gray-700 text-white rounded p-2 border-none outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCategory}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAddingCategory(false);
+                      setNewCategory('');
+                    }}
+                    className="text-gray-400 hover:text-white px-3"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Level *
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={10}
-                value={level}
-                required
-                onChange={e => setLevel(e.target.value)}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none"
-                placeholder="Enter level (e.g. 1, 2, 3...)"
-              />
-            </div>
+
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -275,8 +352,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
               {uploading
                 ? 'Uploading...'
                 : initialData
-                ? 'Update Video'
-                : 'Upload Video'}
+                  ? 'Update Video'
+                  : 'Upload Video'}
             </button>
           </div>
         </form>

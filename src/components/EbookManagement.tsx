@@ -21,6 +21,7 @@ interface EbookData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
+const IMG_URL = import.meta.env.VITE_IMG_URL;
 
 const EbookManagement: React.FC = () => {
   const [ebooks, setEbooks] = useState<EbookData[]>([]);
@@ -131,7 +132,7 @@ const EbookManagement: React.FC = () => {
           <div key={ebook._id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-red-500 transition-colors duration-200">
             <div className="relative group">
               <img
-                src={ebook.coverUrl ? API_URL.replace('/api', '') + ebook.coverUrl : 'https://placehold.co/300x400?text=No+Cover'}
+                src={ebook.coverUrl ? IMG_URL + ebook.coverUrl : 'https://placehold.co/300x400?text=No+Cover'}
                 alt={ebook.title}
                 className="w-full h-64 object-contain"
               />

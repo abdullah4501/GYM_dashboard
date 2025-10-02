@@ -124,7 +124,7 @@ const EbookUploadModal: React.FC<EbookUploadModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-      <div className="bg-gray-900 rounded-xl p-8 w-full max-w-[450px] relative shadow-2xl">
+      <div className="bg-gray-900 rounded-xl p-8 w-full max-w-[650px] max-h-[90vh] overflow-y-auto relative shadow-2xl">
         <button
           onClick={onClose}
           className="absolute right-4 top-3 text-white text-3xl font-bold hover:text-red-400"
@@ -163,7 +163,7 @@ const EbookUploadModal: React.FC<EbookUploadModalProps> = ({
               type="file"
               accept=".pdf,image/jpeg,image/png"
               onChange={handleEbookFile}
-              className="w-full text-white"
+              className="w-full !text-white"
               required
             />
             {ebookFile && (
@@ -178,7 +178,7 @@ const EbookUploadModal: React.FC<EbookUploadModalProps> = ({
               type="file"
               accept="image/jpeg,image/png"
               onChange={handleCoverFile}
-              className="w-full text-white"
+              className="w-full !text-white"
               required
             />
             {coverPreview && (
@@ -199,7 +199,7 @@ const EbookUploadModal: React.FC<EbookUploadModalProps> = ({
               step="0.01"
               value={form.price}
               onChange={handleChange}
-              className="w-full bg-gray-700 text-white rounded p-2 border-none outline-none"
+              className="w-full bg-gray-700 !text-white rounded p-2 border-none outline-none"
               disabled={form.isFree}
             />
           </div>

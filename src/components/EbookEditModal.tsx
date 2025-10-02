@@ -126,6 +126,7 @@ const EbookEditModal: React.FC<Props> = ({ ebook, onClose, onUpdate }) => {
                 type="checkbox"
                 name="isFree"
                 checked={form.isFree}
+                className="text-white"
                 onChange={handleChange}
               />
               Free
@@ -135,6 +136,7 @@ const EbookEditModal: React.FC<Props> = ({ ebook, onClose, onUpdate }) => {
                 type="checkbox"
                 name="forMembersOnly"
                 checked={form.forMembersOnly}
+                className="!text-white"
                 onChange={handleChange}
               />
               Members Only
@@ -143,7 +145,7 @@ const EbookEditModal: React.FC<Props> = ({ ebook, onClose, onUpdate }) => {
           <div>
             <label className="block text-white mb-1">Replace Cover Image</label>
             <input
-              className="block w-full"
+              className="block w-full text-white"
               type="file"
               accept="image/jpeg,image/png"
               onChange={(e) => setCover(e.target.files?.[0] || null)}
@@ -152,7 +154,7 @@ const EbookEditModal: React.FC<Props> = ({ ebook, onClose, onUpdate }) => {
           <div>
             <label className="block text-white mb-1">Replace eBook File</label>
             <input
-              className="block w-full"
+              className="block w-full text-white"
               type="file"
               accept="application/pdf,image/jpeg,image/png"
               onChange={(e) => setEbookFile(e.target.files?.[0] || null)}

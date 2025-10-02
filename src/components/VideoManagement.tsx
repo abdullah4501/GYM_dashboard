@@ -13,7 +13,6 @@ interface VideoData {
     _id: string;
     name: string;
   } | null;
-  level: string;
   description: string;
   forMembersOnly: boolean;
   videoUrl: string;
@@ -27,6 +26,7 @@ interface CategoryData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
+const VITE_IMG_URL = import.meta.env.VITE_IMG_URL;
 
 
 const VideoManagement: React.FC = () => {
@@ -156,7 +156,7 @@ const VideoManagement: React.FC = () => {
               <img
                 src={
                   video.thumbnailUrl
-                    ? `${API_URL.replace('/api', '')}${video.thumbnailUrl}`
+                    ? `${VITE_IMG_URL}${video.thumbnailUrl}`
                     : 'https://placehold.co/320x240?text=No+Thumbnail'
                 }
                 alt={video.title}
@@ -177,9 +177,6 @@ const VideoManagement: React.FC = () => {
                   }`}>
                   {video.forMembersOnly ? 'Members Only' : 'Public'}
                 </span>
-              </div>
-              <div className="absolute bottom-3 right-3 bg-black bg-opacity-75 text-white px-2 py-1 text-sm rounded">
-                Level: {video.level}
               </div>
             </div>
             <div className="p-4">

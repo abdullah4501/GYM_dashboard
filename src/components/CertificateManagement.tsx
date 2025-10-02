@@ -19,6 +19,7 @@ interface CertificateData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
+const IMG_URL = import.meta.env.VITE_IMG_URL;
 
 const CertificateManagement: React.FC = () => {
   const [certificates, setCertificates] = useState<CertificateData[]>([]);
@@ -123,7 +124,7 @@ const CertificateManagement: React.FC = () => {
           <div key={cert._id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-red-500 transition-colors duration-200">
             <div className="relative group">
               <img
-                src={cert.thumbUrl ? API_URL.replace('/api', '') + cert.thumbUrl : 'https://placehold.co/300x400?text=No+Thumbnail'}
+                src={cert.thumbUrl ? IMG_URL + cert.thumbUrl : 'https://placehold.co/300x400?text=No+Thumbnail'}
                 alt={cert.name}
                 className="w-full h-64 object-contain"
               />
